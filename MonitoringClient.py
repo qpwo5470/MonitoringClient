@@ -37,7 +37,14 @@ class MonitoringClient:
                 if response.content == b'1':
                     print('shutdown')
                     import os
-                    os.system("shutdown -t 0 -r -f")
+                    from sys import platform as _platform
+
+                    if _platform == "linux" or _platform == "linux2":
+                        os.system("reboot now")
+                    elif _platform == "darwin":
+                        os.system("reboot now")
+                    elif _platform == "win32":
+                        os.system("shutdown -t 0 -r -f")
             except Exception as e:
                 print(e)
             sleep(5)

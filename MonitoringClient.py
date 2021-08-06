@@ -5,6 +5,7 @@ import platform
 import requests
 import json
 import signal
+import socket
 
 
 class MonitoringClient:
@@ -14,6 +15,7 @@ class MonitoringClient:
         self.__data['device_name'] = platform.node()
         self.__state = {}
         self.__state['app'] = 'Python3'
+        self.__state['local_ip'] = socket.gethostbyname(socket.gethostname())
         self.__read_lock = threading.Lock()
         self.__state['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %A %H:%M:%S')
         self.__thread = threading.Thread(target=self.__send, args=())

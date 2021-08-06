@@ -37,7 +37,6 @@ class MonitoringClient:
                 if response == b'1':
                     import os
                     os.system("shutdown -t 0 -r -f")
-
             except Exception as e:
                 print(e)
             sleep(5)

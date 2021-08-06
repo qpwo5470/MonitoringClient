@@ -41,7 +41,7 @@ class MonitoringClient:
                 print(e)
             sleep(5)
 
-    def __shutdown(self):
+    def __shutdown(self, signum, frame):
         self.__state['exit_time'] = datetime.datetime.now().strftime('%Y-%m-%d %A %H:%M:%S')
         self.__data['data'] = json_dumps(self.__state)
         try:

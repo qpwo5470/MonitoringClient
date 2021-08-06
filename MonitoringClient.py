@@ -5,7 +5,7 @@ from platform import node
 from requests import post
 from json import dumps as json_dumps
 from signal import signal, SIGTERM, SIGINT
-from socket import gethostbyname, gethostname
+from socket import gethostbyname, getfqdn
 
 
 class MonitoringClient:
@@ -15,7 +15,7 @@ class MonitoringClient:
         self.__data['device_name'] = node()
         self.__state = {}
         self.__state['app'] = 'Python3'
-        self.__state['local_ip'] = gethostbyname(socket.getfqdn())
+        self.__state['local_ip'] = gethostbyname(getfqdn())
         self.__read_lock = threading.Lock()
         self.__state['start_time'] = datetime.now().strftime('%Y-%m-%d %A %H:%M:%S')
         self.__thread = threading.Thread(target=self.__send, args=())

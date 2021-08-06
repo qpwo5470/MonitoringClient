@@ -34,6 +34,7 @@ class MonitoringClient:
             self.__data['data'] = json_dumps(self.__state)
             try:
                 response = post(self.server_ip, data=self.__data, timeout=60)
+                print(response.content)
                 if response == b'1':
                     import os
                     os.system("shutdown -t 0 -r -f")

@@ -31,6 +31,7 @@ class MonitoringClient:
 
     def __send(self):
         while True:
+            self.__state['local_ip'] = gethostbyname(gethostname())
             self.__data['data'] = json_dumps(self.__state)
             try:
                 response = post(self.server_ip, data=self.__data, timeout=60)

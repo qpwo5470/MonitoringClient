@@ -15,7 +15,7 @@ class MonitoringClient:
         self.__data['device_name'] = node()
         self.__state = {}
         self.__state['app'] = 'Python3'
-        self.__state['local_ip'] = gethostbyname(gethostname())
+        self.__state['local_ip'] = gethostbyname(socket.getfqdn())
         self.__read_lock = threading.Lock()
         self.__state['start_time'] = datetime.now().strftime('%Y-%m-%d %A %H:%M:%S')
         self.__thread = threading.Thread(target=self.__send, args=())
@@ -31,7 +31,6 @@ class MonitoringClient:
 
     def __send(self):
         while True:
-            self.__state['local_ip'] = gethostbyname(gethostname())
             self.__data['data'] = json_dumps(self.__state)
             try:
                 response = post(self.server_ip, data=self.__data, timeout=60)
